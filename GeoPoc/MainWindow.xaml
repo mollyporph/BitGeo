@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GeoPoc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="GeoPoc" Height="720" Width="1280">
     <Grid>
-        
+        <Canvas Name="mapCanvas" Background="Black" Height="600" Width="600"></Canvas>
     </Grid>
 </Window>
