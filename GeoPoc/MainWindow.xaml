@@ -11,7 +11,13 @@
             <ColumnDefinition Width="60*"/>
             <ColumnDefinition Width="40*"/>
         </Grid.ColumnDefinitions>
-        <Canvas Grid.Column="0" Name="mapCanvas" HorizontalAlignment="Left" Background="Black" Height="700" Width="760" MouseLeftButtonUp="mapCanvas_MouseLeftButtonUp"></Canvas>
+        <Canvas Grid.Column="0" Name="mapCanvas" HorizontalAlignment="Left" Background="Black" Height="700" Width="760" MouseLeftButtonUp="mapCanvas_MouseLeftButtonUp">
+            <Canvas.CacheMode>
+                <BitmapCache EnableClearType="False" 
+         RenderAtScale="1" 
+         SnapsToDevicePixels="True" />
+            </Canvas.CacheMode>
+        </Canvas>
         <TextBlock Grid.Column="1" Name="Data"></TextBlock>
     </Grid>
 </Window>

@@ -40,7 +40,7 @@ namespace GeoPoc
 
         private void GeoRepo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            PaintTree(geoRepo);
+           // PaintTree(geoRepo);
             PaintDots(dots);
         }
         private void mapCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -55,6 +55,7 @@ namespace GeoPoc
         public void BuildDataLabel(Dot dot)
         {
             var sb = new StringBuilder();
+            sb.Append($"Number of dots: {dots.Count}\n");
             sb.Append($"Data for point: {dot.Id}\n\n\n");
             var stopWatches = new List<Stopwatch>();
 
@@ -72,7 +73,8 @@ namespace GeoPoc
             }
             var avg = stopWatches.Average(x => x.ElapsedTicks);
             var ns = ((double)avg / (double)Stopwatch.Frequency) * 1000000000;
-            sb.Append($"Neighbours fetched in avg {Math.Floor(ns)} nanoseconds ({Math.Floor(avg)} ticks)");
+            var ms =  ((double)avg / (double)Stopwatch.Frequency) * 1000;
+            sb.Append($"Neighbours fetched in avg {Math.Floor(ms)} ms ({Math.Floor(avg)} ticks)");
             Data.Text = sb.ToString();
             
         }
