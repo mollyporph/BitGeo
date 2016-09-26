@@ -22,8 +22,10 @@ namespace GeoPoc
     /// </summary>
     public partial class MainWindow : Window
     {
-        SetCollection<GeoSquareData> geoRepo = new SetCollection<GeoSquareData>();
+        Random r = new Random();
+SetCollection<GeoSquareData> geoRepo = new SetCollection<GeoSquareData>();
         SetCollection<Dot> dots = new SetCollection<Dot>();
+        long avgIndex = 0;
         GeoSquareData root = new GeoSquareData
         {
             Id = 1,
@@ -36,21 +38,39 @@ namespace GeoPoc
         {
             InitializeComponent();
             geoRepo.CollectionChanged += GeoRepo_CollectionChanged;
+            dots.CollectionChanged += Dots_CollectionChanged;
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            for(int i = 0;i<1000;i++)
+            {
+                dots.Add(new Dot(r.NextDouble() * 760.0, r.NextDouble() * 700));
+            }
+        }
+        private void Dots_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            var dot = dots.Last();
+            var watch = Stopwatch.StartNew();
+            BuildTreeFromDot(root, geoRepo, dot, 12);
+            watch.Stop();
+            avgIndex = watch.ElapsedTicks;
+            PaintDots(dot);
+            BuildDataLabel(dot);
         }
 
         private void GeoRepo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-           // PaintTree(geoRepo);
-            PaintDots(dots);
+            PaintTree(geoRepo.Last());
+
         }
         private void mapCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            mapCanvas.Children.Clear();
             Point p = e.GetPosition(mapCanvas);
             Dot dot = new Dot(p.X, p.Y);
             dots.Add(dot);
-            BuildTreeFromDot(root, geoRepo, dot, 12);
-            BuildDataLabel(dot);
+
+
         }
         public void BuildDataLabel(Dot dot)
         {
@@ -68,36 +88,31 @@ namespace GeoPoc
                 stopWatches.Add(watch);
                 var square = geoRepo.FirstOrDefault(x => x.Id == geoid);
 
-                sb.Append($"Neighbours in avg {Math.Floor(square.Hypotenuse)} distance aways: {dotCount}\n");
+                sb.Append($"Neighbours in avg {Math.Floor(square.Hypotenuse/2)} distance aways: {dotCount}\n");
 
             }
             var avg = stopWatches.Average(x => x.ElapsedTicks);
-            var ns = ((double)avg / (double)Stopwatch.Frequency) * 1000000000;
             var ms =  ((double)avg / (double)Stopwatch.Frequency) * 1000;
+            var msIndex = ((double)avgIndex / (double)Stopwatch.Frequency) * 1000;
+            sb.Append($"\n\nDot index in {Math.Floor(msIndex)} ms ({Math.Floor((double)avgIndex)} ticks)\n\n");
             sb.Append($"Neighbours fetched in avg {Math.Floor(ms)} ms ({Math.Floor(avg)} ticks)");
             Data.Text = sb.ToString();
             
         }
-        public void PaintDots(SetCollection<Dot> dots)
+        public void PaintDots(Dot dot)
         {
-            foreach (var dot in dots)
-            {
-                var isLast = dots.IndexOf(dot) == dots.Count - 1;
                 var dotCircle = new Ellipse
                 {
-                    Width = isLast ? 5.5 :3.7,
-                    Height = isLast ? 5.5 : 3.7
+                    Width = 3.7,
+                    Height = 3.7
                 };
-                dotCircle.Fill = new SolidColorBrush(isLast ? Colors.Blue : Colors.Green);
+                dotCircle.Fill = new SolidColorBrush(Colors.Green);
                 Canvas.SetLeft(dotCircle, dot.position.X);
                 Canvas.SetTop(dotCircle, dot.position.Y);
                 mapCanvas.Children.Add(dotCircle);
-            }
         }
-        public void PaintTree(SetCollection<GeoSquareData> geoRepo)
+        public void PaintTree(GeoSquareData node)
         {
-            foreach (var node in geoRepo)
-            {
                 var rec = new Rectangle
                 {
                     Height = node.Height,
@@ -111,7 +126,6 @@ namespace GeoPoc
                 Canvas.SetTop(rec, node.Y);
                 Canvas.SetLeft(rec, node.X);
                 mapCanvas.Children.Add(rec);
-            }
         }
         public void BuildTreeFromDot(GeoSquareData currentNode, SetCollection<GeoSquareData> geoRepo, Dot dot, int maxLevel = 5)
         {
@@ -227,7 +241,6 @@ namespace GeoPoc
             BuildTree(parent.lower, geolookup,maxLevel);
             BuildTree(parent.higher, geolookup, maxLevel);
         }
-
 
     }
 

@@ -18,6 +18,10 @@
          SnapsToDevicePixels="True" />
             </Canvas.CacheMode>
         </Canvas>
-        <TextBlock Grid.Column="1" Name="Data"></TextBlock>
+        <StackPanel Grid.Column="1">
+            <Button Click="Button_Click" HorizontalAlignment="Left" Margin="5">Add 1000 points</Button>
+            <TextBlock  Name="Data"></TextBlock>
+        </StackPanel>
+
     </Grid>
 </Window>
